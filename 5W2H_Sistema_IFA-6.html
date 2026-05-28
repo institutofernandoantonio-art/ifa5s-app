@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5W2H — Sistema IFA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111;
+  --surface2: #181818;
+  --border: #2a2a2a;
+  --gold: #c9922a;
+  --gold-light: #e8b355;
+  --gold-dim: rgba(201,146,42,0.13);
+  --text: #f0ede8;
+  --text-dim: #888;
+  --text-muted: #444;
+  --danger: #e05555;
+  --success: #4caf74;
+  --r: 8px;
+  --rlg: 14px;
+  /* company overrides */
+  --co-primary: #c9922a;
+  --co-bg: #0a0a0a;
+  --co-text: #f0ede8;
+  --co-surface: #111;
+  --co-border: #2a2a2a;
+  --co-dim: #888;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+
+/* ══ HOME ══ */
+#screen-home{
+  background:radial-gradient(ellipse at 20% 50%,rgba(201,146,42,.07) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(201,146,42,.04) 0%,transparent 50%),var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;
+}
+.home-logo{width:60px;height:60px;margin-bottom:24px;}
+.home-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,58px);letter-spacing:4px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;text-align:center;}
+.home-sub{font-size:12px;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:56px;text-align:center;}
+.role-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;max-width:640px;width:100%;}
+.role-card{flex:1;min-width:190px;max-width:270px;border:1px solid var(--border);border-radius:var(--rlg);padding:28px 22px;cursor:pointer;
+  transition:all .22s;background:var(--surface);text-align:center;position:relative;overflow:hidden;}
+.role-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gold-dim),transparent);opacity:0;transition:opacity .22s;}
+.role-card:hover::before{opacity:1;}
+.role-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+.role-icon{font-size:32px;margin-bottom:12px;display:block;}
+.role-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:500;}
+.role-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:8px;}
+.role-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+.home-footer{margin-top:52px;font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
+
+/* ══ SHARED HEADER ══ */
+.top-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.top-brand{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;color:var(--gold);}
+.btn{padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:12px;font-weight:500;letter-spacing:.4px;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#000;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,146,42,.35);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-dim);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--text-dim);padding:7px 10px;}
+.btn-ghost:hover{color:var(--text);}
+.btn-danger{background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.25);color:var(--danger);}
+.btn-danger:hover{background:rgba(224,85,85,.18);}
+.btn-sm{padding:6px 11px;font-size:11px;}
+
+/* ══ ADMIN TABS ══ */
+.admin-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 24px;background:var(--surface);}
+.admin-tab{padding:12px 18px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-tab:hover:not(.active){color:var(--text);}
+.page-body{padding:24px;max-width:1180px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ══ COMPANY CARDS ══ */
+.companies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:18px;}
+.co-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;transition:all .2s;cursor:pointer;}
+.co-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.co-card-head{padding:18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.co-logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;flex-shrink:0;overflow:hidden;padding:4px;}
+.co-logo img{width:100%;height:100%;object-fit:contain;border-radius:6px;}
+.co-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.co-resp{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.co-card-body{padding:14px 18px;}
+.co-stats{display:flex;gap:14px;margin-bottom:12px;}
+.stat-v{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;}
+.stat-l{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.co-prog{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.co-prog-fill{height:100%;border-radius:2px;transition:width .5s;}
+.co-actions{display:flex;gap:7px;}
+.empty-state{text-align:center;padding:70px 20px;color:var(--text-muted);}
+.empty-icon{font-size:44px;margin-bottom:14px;}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);
+  z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);
+  width:100%;max-width:620px;max-height:92vh;overflow-y:auto;animation:mIn .18s ease;}
+.modal-wide{max-width:800px;}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:none;}}
+.modal-head{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--gold);}
+.modal-x{width:30px;height:30px;border-radius:6px;border:none;background:var(--surface2);
+  color:var(--text-dim);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-x:hover{background:var(--border);color:var(--text);}
+.modal-body{padding:20px 22px;}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* ══ FORM ══ */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.frow.full{grid-template-columns:1fr;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);}
+.fi,.fs,.fta{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);
+  padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .18s;outline:none;width:100%;}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--gold);}
+.fta{resize:vertical;min-height:76px;}
+.fs option{background:var(--surface2);}
+
+/* ══ COLOR PICKER ══ */
+.csec{margin-bottom:12px;}
+.csec-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;display:block;}
+.crow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.cswatch{width:30px;height:30px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .14s;flex-shrink:0;}
+.cswatch.sel,.cswatch:hover{border-color:#fff;transform:scale(1.1);}
+.ccustom{display:flex;align-items:center;gap:6px;}
+.ccustom input[type="color"]{width:30px;height:30px;border:none;border-radius:6px;cursor:pointer;background:none;padding:0;}
+.logo-drop{border:2px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;
+  cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.logo-drop:hover{border-color:var(--gold);background:var(--gold-dim);}
+.logo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.logo-prev{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;}
+.logo-prev-img{width:80px;height:80px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:var(--surface2);padding:4px;}
+
+/* ══ PLAN SCREEN ══ */
+.plan-topbar{
+  padding:14px 24px;border-bottom:1px solid var(--co-border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+}
+.plan-co-wrap{display:flex;align-items:center;gap:12px;}
+.plan-logo{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;overflow:hidden;flex-shrink:0;padding:4px;}
+.plan-logo img{width:100%;height:100%;object-fit:contain;border-radius:6px;}
+.plan-co-name{font-weight:600;font-size:14px;}
+.plan-co-proj{font-size:11px;opacity:.55;margin-top:2px;}
+.plan-body{padding:24px;max-width:1400px;margin:0 auto;}
+
+/* ══ PROGRESS BAR ══ */
+.prog-box{border:1px solid var(--co-border);border-radius:var(--rlg);padding:18px;margin-bottom:24px;background:var(--co-surface);}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.prog-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--co-dim);font-weight:500;}
+.prog-pct{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;}
+.prog-bar{height:5px;background:var(--co-border);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s;}
+.prog-info{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--co-dim);}
+
+/* ══ CATEGORY BLOCK ══ */
+.cat-block{border:1px solid var(--co-border);border-radius:var(--rlg);overflow:hidden;margin-bottom:24px;background:var(--co-surface);}
+.cat-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--co-border);cursor:pointer;user-select:none;transition:background .18s;}
+.cat-head:hover{filter:brightness(1.06);}
+.cat-head-left{display:flex;align-items:center;gap:10px;}
+.cat-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.cat-title{font-weight:600;font-size:14px;}
+.cat-count{font-size:11px;opacity:.5;margin-top:1px;}
+.cat-chevron{font-size:11px;opacity:.5;transition:transform .22s;}
+.cat-block.collapsed .cat-chevron{transform:rotate(-90deg);}
+.cat-block.collapsed .cat-body{display:none;}
+
+/* ══ 5W2H TABLE ══ */
+.w2h-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.w2h-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px;}
+
+/* HEADER ROW */
+.w2h-table thead tr th{
+  padding:10px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-style:italic;
+  font-weight:700;
+  font-size:12px;
+  color:#fff;
+  text-align:left;
+  white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.18);
+  position:relative;
+}
+.w2h-table thead tr th:last-child{border-right:none;}
+.w2h-table thead tr th .col-key{display:block;font-weight:800;font-size:13px;}
+.w2h-table thead tr th .col-pt{display:block;font-weight:400;font-size:10px;opacity:.85;margin-top:1px;}
+
+/* COL WIDTHS */
+.w2h-table .col-what  {width:13%;}
+.w2h-table .col-why   {width:13%;}
+.w2h-table .col-when  {width:10%;}
+.w2h-table .col-where {width:10%;}
+.w2h-table .col-who   {width:10%;}
+.w2h-table .col-how   {width:30%;}
+.w2h-table .col-howm  {width:10%;}
+.w2h-table .col-act   {width:4%;}
+
+/* BODY ROWS */
+.w2h-table tbody tr{border-bottom:1px solid var(--co-border);transition:background .14s;}
+.w2h-table tbody tr:last-child{border-bottom:none;}
+.w2h-table tbody tr:hover{filter:brightness(1.04);}
+.w2h-table tbody td{
+  padding:12px 14px;
+  vertical-align:top;
+  color:var(--co-text);
+  border-right:1px solid var(--co-border);
+  font-size:12px;
+  line-height:1.55;
+}
+.w2h-table tbody td:last-child{border-right:none;}
+.w2h-table tbody td.td-how{
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  white-space:pre-wrap;
+  color:var(--co-dim);
+}
+/* status cell */
+.td-status{text-align:center;vertical-align:middle;}
+.status-btn{
+  width:24px;height:24px;border-radius:50%;border:2px solid var(--co-border);
+  background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;transition:all .18s;flex-shrink:0;
+}
+.status-btn.done{background:var(--success);border-color:var(--success);color:#fff;}
+.status-btn.partial{border-color:var(--gold);background:rgba(201,146,42,.2);color:var(--gold);}
+/* actions cell */
+.td-acts{text-align:center;vertical-align:top;padding:8px 6px!important;white-space:nowrap;}
+.row-btn{width:24px;height:24px;border-radius:5px;border:none;cursor:pointer;font-size:11px;
+  background:rgba(255,255,255,.05);color:var(--co-dim);display:inline-flex;align-items:center;justify-content:center;
+  transition:all .14s;margin:1px;}
+.row-btn:hover{background:rgba(255,255,255,.1);color:var(--co-text);}
+/* empty row */
+.w2h-empty{padding:24px;text-align:center;font-size:12px;color:var(--co-dim);}
+
+/* ══ MONITOR ══ */
+.monitor-head{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+.mon-back{width:32px;height:32px;border-radius:7px;background:var(--surface2);border:none;
+  color:var(--text-dim);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .14s;}
+.mon-back:hover{background:var(--border);color:var(--text);}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:16px;}
+.kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:6px;font-weight:500;}
+.kpi-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;}
+.kpi-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.link-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px;
+  margin-bottom:20px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
+.link-inp{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);
+  padding:9px 12px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:11px;outline:none;min-width:200px;}
+.mtable-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;margin-bottom:20px;}
+.mtable-lbl{padding:12px 18px;font-size:10px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--text-dim);border-bottom:1px solid var(--border);font-weight:500;}
+table.mtable{width:100%;border-collapse:collapse;font-size:12px;}
+table.mtable th{padding:9px 14px;text-align:left;font-size:10px;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface2);}
+table.mtable td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;color:var(--text-dim);}
+table.mtable tr:last-child td{border-bottom:none;}
+table.mtable tr:hover td{background:var(--surface2);}
+.spill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;
+  font-size:10px;font-weight:600;letter-spacing:.4px;}
+.spill.done{background:rgba(76,175,116,.1);color:var(--success);}
+.spill.partial{background:rgba(201,146,42,.1);color:var(--gold);}
+.spill.pending{background:rgba(100,100,100,.1);color:var(--text-muted);}
+
+/* ══ TOAST ══ */
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);
+  border-radius:var(--r);padding:11px 14px;font-size:12px;color:var(--text);
+  animation:tIn .2s ease;max-width:280px;box-shadow:0 4px 18px rgba(0,0,0,.5);}
+.toast.s{border-left-color:var(--success);}
+.toast.d{border-left-color:var(--danger);}
+@keyframes tIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:none;}}
+
+/* ══ META CHIPS ══ */
+.meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.mchip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:16px;
+  border:1px solid var(--co-border);font-size:11px;background:var(--co-surface);}
+.mchip span:first-child{opacity:.45;font-size:10px;text-transform:uppercase;letter-spacing:1px;}
+
+/* RESP */
+@media(max-width:640px){
+  .frow{grid-template-columns:1fr;}
+  .page-body,.plan-body{padding:14px;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .role-cards{flex-direction:column;align-items:center;}
+  .role-card{max-width:100%;width:100%;}
+  .plan-topbar{flex-direction:column;align-items:flex-start;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="screen-home" class="screen active">
+  <svg class="home-logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="30" cy="30" r="28" stroke="#c9922a" stroke-width="1.2" opacity=".3"/>
+    <circle cx="30" cy="30" r="20" stroke="#c9922a" stroke-width="1.2" opacity=".5"/>
+    <circle cx="30" cy="30" r="4" fill="#c9922a"/>
+    <line x1="30" y1="10" x2="30" y2="18" stroke="#c9922a" stroke-width="1.4"/>
+    <line x1="30" y1="42" x2="30" y2="50" stroke="#c9922a" stroke-width="1.4"/>
+    <line x1="10" y1="30" x2="18" y2="30" stroke="#c9922a" stroke-width="1.4"/>
+    <line x1="42" y1="30" x2="50" y2="30" stroke="#c9922a" stroke-width="1.4"/>
+    <line x1="16.5" y1="16.5" x2="22.5" y2="22.5" stroke="#c9922a" stroke-width="1" opacity=".6"/>
+    <line x1="37.5" y1="37.5" x2="43.5" y2="43.5" stroke="#c9922a" stroke-width="1" opacity=".6"/>
+    <line x1="43.5" y1="16.5" x2="37.5" y2="22.5" stroke="#c9922a" stroke-width="1" opacity=".6"/>
+    <line x1="22.5" y1="37.5" x2="16.5" y2="43.5" stroke="#c9922a" stroke-width="1" opacity=".6"/>
+  </svg>
+  <div class="home-title">5W2H</div>
+  <div class="home-sub">Instituto Fernando Antônio · Planos de Ação</div>
+  <div class="role-cards">
+    <div class="role-card" onclick="goAdmin()">
+      <span class="role-icon">🎯</span>
+      <div class="role-label">Consultor IFA</div>
+      <div class="role-name">Painel Admin</div>
+      <div class="role-desc">Gerencie empresas, personalize identidade visual e monitore todos os planos.</div>
+    </div>
+    <div class="role-card" onclick="goResp()">
+      <span class="role-icon">📋</span>
+      <div class="role-label">Empresa</div>
+      <div class="role-name">Meu Plano</div>
+      <div class="role-desc">Acesse e atualize as ações do seu plano 5W2H enviado pelo consultor.</div>
+    </div>
+  </div>
+  <div class="home-footer">Sistema IFA · 5W2H Dinâmico</div>
+</div>
+
+<!-- ═══════════ ADMIN ═══════════ -->
+<div id="screen-admin" class="screen">
+  <div class="top-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-ghost" onclick="goHome()" style="padding:7px 9px;">←</button>
+      <div class="top-brand">IFA · Admin</div>
+    </div>
+    <button class="btn btn-gold" onclick="openNewCoModal()">＋ Nova Empresa</button>
+  </div>
+  <div class="admin-tabs">
+    <div class="admin-tab active" onclick="switchTab('companies')">Empresas</div>
+    <div class="admin-tab" onclick="switchTab('all')">Todas as Ações</div>
+  </div>
+  <div class="page-body">
+    <div id="tab-companies" class="tab-panel active">
+      <div id="co-grid" class="companies-grid"></div>
+      <div id="co-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">🏢</div>
+        <h3 style="color:var(--text-dim);margin-bottom:8px;">Nenhuma empresa cadastrada</h3>
+        <p style="font-size:12px;">Clique em <strong>+ Nova Empresa</strong> para começar.</p>
+      </div>
+    </div>
+    <div id="tab-all" class="tab-panel">
+      <div id="all-actions-content" style="margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PLAN ═══════════ -->
+<div id="screen-plan" class="screen"></div>
+
+<!-- ═══════════ MONITOR ═══════════ -->
+<div id="screen-monitor" class="screen"></div>
+
+<!-- ═══════ MODAL: EMPRESA ═══════ -->
+<div id="modal-co" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mco-title">Nova Empresa</div>
+      <button class="modal-x" onclick="closeModal('modal-co')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label class="fl">Nome da Empresa *</label><input class="fi" id="f-name" placeholder="Ex: Açaí do Ninja"></div>
+        <div class="fg"><label class="fl">Responsável *</label><input class="fi" id="f-resp" placeholder="Ex: Marcelo"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Projeto / Problema</label><input class="fi" id="f-proj" placeholder="Ex: Transformação Ninja"></div>
+        <div class="fg"><label class="fl">Localidade</label><input class="fi" id="f-loc" placeholder="Ex: Santo Antônio da Barra"></div>
+      </div>
+      <!-- LOGO -->
+      <div class="fg" style="margin-bottom:12px;">
+        <label class="fl">Logotipo da Empresa</label>
+        <div class="logo-drop" id="logo-drop">
+          <input type="file" accept="image/*" onchange="handleLogo(event)" id="logo-input">
+          <div id="logo-ph">
+            <div style="font-size:24px;margin-bottom:4px;">🖼️</div>
+            <div style="font-size:12px;color:var(--text-dim);">Clique ou arraste o logo</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">PNG, JPG, SVG</div>
+          </div>
+          <div id="logo-pv" class="logo-prev" style="display:none;">
+            <img id="logo-pv-img" class="logo-prev-img" src="" alt="">
+            <div><div style="font-size:12px;" id="logo-pv-name"></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;">Carregado ✓</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- COR PRINCIPAL -->
+      <div class="csec">
+        <span class="csec-lbl">Cor Principal (cabeçalho da tabela)</span>
+        <div class="crow">
+          <div class="cswatch sel" style="background:#6aaa1e;" data-c="#6aaa1e" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#c9922a;" data-c="#c9922a" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#1a6b3a;" data-c="#1a6b3a" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#1e3a8a;" data-c="#1e3a8a" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#7c1d26;" data-c="#7c1d26" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#6b21a8;" data-c="#6b21a8" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#0e7490;" data-c="#0e7490" onclick="pickColor(this,'p')"></div>
+          <div class="cswatch" style="background:#374151;" data-c="#374151" onclick="pickColor(this,'p')"></div>
+          <div class="ccustom">
+            <input type="color" id="cp-p" value="#6aaa1e" oninput="customColor('p',this.value)">
+            <span style="font-size:10px;color:var(--text-muted);">Personalizar</span>
+          </div>
+        </div>
+        <div id="cp-prev" style="margin-top:8px;display:inline-flex;align-items:center;gap:7px;
+          padding:6px 12px;border-radius:14px;font-size:11px;font-weight:600;
+          background:rgba(106,170,30,.12);color:#6aaa1e;border:1px solid rgba(106,170,30,.25);">
+          ● Cor do cabeçalho
+        </div>
+      </div>
+      <!-- FUNDO -->
+      <div class="csec">
+        <span class="csec-lbl">Tema de Fundo do Plano</span>
+        <div class="crow">
+          <div class="cswatch sel" style="background:#0a0a0a;border:1px solid #333;" data-c="#0a0a0a" onclick="pickColor(this,'bg')"></div>
+          <div class="cswatch" style="background:#0f172a;" data-c="#0f172a" onclick="pickColor(this,'bg')"></div>
+          <div class="cswatch" style="background:#0c1a0e;" data-c="#0c1a0e" onclick="pickColor(this,'bg')"></div>
+          <div class="cswatch" style="background:#1a0808;" data-c="#1a0808" onclick="pickColor(this,'bg')"></div>
+          <div class="cswatch" style="background:#f5f5f0;" data-c="#f5f5f0" onclick="pickColor(this,'bg')"></div>
+          <div class="cswatch" style="background:#fff;border:1px solid #ddd;" data-c="#ffffff" onclick="pickColor(this,'bg')"></div>
+          <div class="ccustom">
+            <input type="color" id="cp-bg" value="#0a0a0a" oninput="customColor('bg',this.value)">
+            <span style="font-size:10px;color:var(--text-muted);">Personalizar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-co')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveCo()">Salvar Empresa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: AÇÃO ═══════ -->
+<div id="modal-action" class="modal-overlay">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div class="modal-title" id="ma-title">Nova Ação</div>
+      <button class="modal-x" onclick="closeModal('modal-action')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow full"><div class="fg">
+        <label class="fl">What? — O que será feito?</label>
+        <input class="fi" id="fa-what" placeholder="Descreva a ação principal">
+      </div></div>
+      <div class="frow full"><div class="fg">
+        <label class="fl">Why? — Por quê?</label>
+        <input class="fi" id="fa-why" placeholder="Justificativa / motivo">
+      </div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">When? — Quando?</label><input class="fi" id="fa-when" placeholder="Ex: Semanalmente a partir de..."></div>
+        <div class="fg"><label class="fl">Where? — Onde?</label><input class="fi" id="fa-where" placeholder="Ex: Loja principal"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Who? — Quem?</label><input class="fi" id="fa-who" placeholder="Nome do responsável"></div>
+        <div class="fg"><label class="fl">How Much? — Quanto custa?</label><input class="fi" id="fa-howm" placeholder="Ex: Sem custos / R$ 500"></div>
+      </div>
+      <div class="frow full"><div class="fg">
+        <label class="fl">How? — Como? (passo a passo)</label>
+        <textarea class="fta" id="fa-how" rows="7" placeholder="Descreva detalhadamente o passo a passo de execução..."></textarea>
+      </div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-action')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveAction()">Salvar Ação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: CATEGORIA ═══════ -->
+<div id="modal-cat" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mcat-title">Nova Categoria</div>
+      <button class="modal-x" onclick="closeModal('modal-cat')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow full"><div class="fg">
+        <label class="fl">Nome da Categoria</label>
+        <input class="fi" id="fcat-name" placeholder="Ex: Gestão Financeira">
+      </div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Ícone (emoji)</label><input class="fi" id="fcat-icon" placeholder="💰" maxlength="4" style="font-size:20px;text-align:center;"></div>
+        <div class="fg"><label class="fl">Cor do ícone</label><input type="color" id="fcat-color" value="#c9922a" style="width:100%;height:40px;border:1px solid var(--border);border-radius:var(--r);background:none;cursor:pointer;"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-cat')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveCat()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-c" id="toasts"></div>
+
+<script>
+// ════════ DATA ════════
+const DEF_CATS = [];
+
+
+const DEF_ACTIONS = {}; // todas as áreas iniciam sem ações — adicione via painel admin
+
+
+// ════════ STATE ════════
+let S = { companies:[], editCoId:null, editActCtx:null, editCatCtx:null, tmpLogo:null, tmpColors:{p:'#6aaa1e',bg:'#0a0a0a'}, planRole:'admin', curCoId:null };
+
+function loadS(){ try{ const r=localStorage.getItem('ifa5w2h'); if(r){ const d=JSON.parse(r); S.companies=d.companies||[]; } }catch(e){} }
+function saveS(){ try{ localStorage.setItem('ifa5w2h',JSON.stringify({companies:S.companies})); }catch(e){} }
+
+// ════════ NAV ════════
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
+function goHome(){ showScreen('home'); }
+function goAdmin(){ renderAdmin(); showScreen('admin'); }
+function goResp(){
+  if(!S.companies.length){ toast('Nenhum plano disponível. Contate o consultor IFA.','d'); return; }
+  if(S.companies.length===1){ openPlan(S.companies[0].id,'responsavel'); return; }
+  const list=S.companies.map((c,i)=>`${i+1}. ${c.name}`).join('\n');
+  const inp=prompt(`Selecione o número do seu plano:\n${list}`);
+  if(!inp) return;
+  const idx=parseInt(inp)-1;
+  if(idx>=0&&idx<S.companies.length) openPlan(S.companies[idx].id,'responsavel');
+  else toast('Seleção inválida.','d');
+}
+
+// ════════ ADMIN ════════
+function renderAdmin(){
+  const grid=document.getElementById('co-grid');
+  const empty=document.getElementById('co-empty');
+  grid.innerHTML='';
+  if(!S.companies.length){ grid.style.display='none'; empty.style.display='block'; return; }
+  grid.style.display='grid'; empty.style.display='none';
+  S.companies.forEach(co=>{
+    const {total,done,partial}=coStats(co);
+    const pct=total?Math.round((done+partial*.5)/total*100):0;
+    const d=document.createElement('div');
+    d.className='co-card';
+    d.innerHTML=`
+      <div class="co-card-head">
+        <div class="co-logo" style="background:${co.colors.p}22;color:${co.colors.p};">
+          ${co.logo?`<img src="${co.logo}" alt="">`:co.name.substring(0,2).toUpperCase()}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="co-name">${co.name}</div>
+          <div class="co-resp">Resp: ${co.resp} · ${co.loc||''}</div>
+        </div>
+      </div>
+      <div class="co-card-body">
+        <div class="co-stats">
+          <div style="flex:1;text-align:center;"><div class="stat-v">${total}</div><div class="stat-l">Ações</div></div>
+          <div style="flex:1;text-align:center;"><div class="stat-v" style="color:var(--success)">${done}</div><div class="stat-l">Concluídas</div></div>
+          <div style="flex:1;text-align:center;"><div class="stat-v" style="color:${co.colors.p}">${pct}%</div><div class="stat-l">Progresso</div></div>
+        </div>
+        <div class="co-prog"><div class="co-prog-fill" style="width:${pct}%;background:${co.colors.p};"></div></div>
+        <div class="co-actions">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="event.stopPropagation();openMonitor('${co.id}')">📊 Monitor</button>
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="event.stopPropagation();openPlan('${co.id}','admin')">📋 Plano</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();editCo('${co.id}')" title="Editar empresa">✏️</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();resetCats('${co.id}')" title="Resetar categorias para as 53 áreas do hospital">🔄</button>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();delCo('${co.id}')" title="Excluir empresa">🗑</button>
+        </div>
+      </div>`;
+    grid.appendChild(d);
+  });
+  renderAllTab();
+}
+
+function renderAllTab(){
+  const c=document.getElementById('all-actions-content'); if(!c) return;
+  let h='';
+  S.companies.forEach(co=>{
+    const {total,done}=coStats(co);
+    h+=`<div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:${co.colors.p};"></div>
+        <strong style="font-size:13px;">${co.name}</strong>
+        <span style="font-size:11px;color:var(--text-muted);">${done}/${total} concluídas</span>
+      </div>
+      <div class="mtable-wrap">
+        <table class="mtable"><thead><tr>
+          <th>Categoria</th><th>Ação (O que?)</th><th>Quem?</th><th>Quando?</th><th>Status</th>
+        </tr></thead><tbody>`;
+    co.categories.forEach(cat=>{
+      (cat.actions||[]).forEach(ac=>{
+        h+=`<tr>
+          <td><span style="font-size:11px;">${cat.icon} ${cat.name}</span></td>
+          <td style="color:var(--text);">${ac.what}</td>
+          <td>${ac.who||'—'}</td>
+          <td>${ac.when||'—'}</td>
+          <td>${spill(ac.status)}</td>
+        </tr>`;
+      });
+    });
+    h+=`</tbody></table></div></div>`;
+  });
+  c.innerHTML=h||'<div class="empty-state" style="padding:40px 0;"><div class="empty-icon">📋</div><h3 style="color:var(--text-dim);">Nenhuma ação cadastrada</h3></div>';
+}
+
+function switchTab(t){
+  document.querySelectorAll('.admin-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='companies')||(i===1&&t==='all')));
+  document.getElementById('tab-companies').classList.toggle('active',t==='companies');
+  document.getElementById('tab-all').classList.toggle('active',t==='all');
+  if(t==='all') renderAllTab();
+}
+
+function coStats(co){
+  let total=0,done=0,partial=0;
+  (co.categories||[]).forEach(cat=>(cat.actions||[]).forEach(ac=>{total++;if(ac.status==='done')done++;if(ac.status==='partial')partial++;}));
+  return {total,done,partial};
+}
+function spill(s){
+  if(s==='done') return `<span class="spill done">✓ Concluída</span>`;
+  if(s==='partial') return `<span class="spill partial">◑ Em andamento</span>`;
+  return `<span class="spill pending">○ Pendente</span>`;
+}
+
+// ════════ CO MODAL ════════
+function openNewCoModal(){
+  S.editCoId=null; S.tmpLogo=null; S.tmpColors={p:'#6aaa1e',bg:'#0a0a0a'};
+  document.getElementById('mco-title').textContent='Nova Empresa';
+  ['name','resp','proj','loc'].forEach(f=>document.getElementById('f-'+f).value='');
+  document.getElementById('logo-ph').style.display='block';
+  document.getElementById('logo-pv').style.display='none';
+  document.getElementById('logo-input').value='';
+  resetSwatches();
+  openModal('modal-co');
+}
+function editCo(id){
+  const co=S.companies.find(c=>c.id===id); if(!co) return;
+  S.editCoId=id; S.tmpLogo=co.logo||null; S.tmpColors={...co.colors};
+  document.getElementById('mco-title').textContent='Editar Empresa';
+  document.getElementById('f-name').value=co.name;
+  document.getElementById('f-resp').value=co.resp;
+  document.getElementById('f-proj').value=co.proj||'';
+  document.getElementById('f-loc').value=co.loc||'';
+  if(co.logo){ document.getElementById('logo-ph').style.display='none'; document.getElementById('logo-pv').style.display='flex'; document.getElementById('logo-pv-img').src=co.logo; document.getElementById('logo-pv-name').textContent='Logo atual'; }
+  else{ document.getElementById('logo-ph').style.display='block'; document.getElementById('logo-pv').style.display='none'; }
+  document.getElementById('cp-p').value=co.colors.p;
+  document.getElementById('cp-bg').value=co.colors.bg;
+  updatePrev();
+  openModal('modal-co');
+}
+function saveCo(){
+  const name=document.getElementById('f-name').value.trim();
+  const resp=document.getElementById('f-resp').value.trim();
+  if(!name||!resp){ toast('Preencha nome e responsável.','d'); return; }
+  if(S.editCoId){
+    const co=S.companies.find(c=>c.id===S.editCoId);
+    if(co){ co.name=name; co.resp=resp; co.proj=document.getElementById('f-proj').value.trim(); co.loc=document.getElementById('f-loc').value.trim(); co.logo=S.tmpLogo; co.colors={...S.tmpColors}; }
+    toast('Empresa atualizada.','s');
+  } else {
+    S.companies.push({
+      id:'co_'+Date.now(), name, resp,
+      proj:document.getElementById('f-proj').value.trim(),
+      loc:document.getElementById('f-loc').value.trim(),
+      logo:S.tmpLogo, colors:{...S.tmpColors},
+      categories:DEF_CATS.map(cat=>({...cat,actions:JSON.parse(JSON.stringify(DEF_ACTIONS[cat.id]||[]))})),
+      createdAt:new Date().toISOString()
+    });
+    toast('Empresa criada!','s');
+  }
+  saveS(); closeModal('modal-co'); renderAdmin();
+}
+function delCo(id){
+  const co=S.companies.find(c=>c.id===id); if(!co) return;
+  if(!confirm(`Excluir "${co.name}"?`)) return;
+  S.companies=S.companies.filter(c=>c.id!==id);
+  saveS(); renderAdmin(); toast('Empresa excluída.','d');
+}
+function resetCats(id){
+  const co=S.companies.find(c=>c.id===id); if(!co) return;
+  if(!confirm(`Substituir as categorias de "${co.name}" pelas 53 áreas do Hospital Prover?\n\nAs ações já cadastradas serão perdidas.`)) return;
+  co.categories=DEF_CATS.map(cat=>({...cat, actions:[]}));
+  saveS(); renderAdmin(); toast('Categorias resetadas — 53 áreas carregadas.','s');
+}
+
+// ════════ PLAN ════════
+function openPlan(coId, role){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  S.curCoId=coId; S.planRole=role;
+  renderPlan(co,role);
+  showScreen('plan');
+}
+
+function renderPlan(co, role){
+  const screen=document.getElementById('screen-plan');
+  const dk=isDark(co.colors.bg);
+  const tv=dk?'#f0ede8':'#1a1a1a';
+  const td=dk?'#888':'#666';
+  const ts=dk?'#111':'#f0f0f0';
+  const tb=dk?'#2a2a2a':'#e0e0e0';
+  const P=co.colors.p;
+
+  // Set CSS vars on screen
+  screen.style.setProperty('--co-primary',P);
+  screen.style.setProperty('--co-bg',co.colors.bg);
+  screen.style.setProperty('--co-text',tv);
+  screen.style.setProperty('--co-surface',ts);
+  screen.style.setProperty('--co-border',tb);
+  screen.style.setProperty('--co-dim',td);
+  screen.style.background=co.colors.bg;
+  screen.style.color=tv;
+
+  const {total,done,partial}=coStats(co);
+  const pct=total?Math.round((done+partial*.5)/total*100):0;
+
+  let html=`
+  <div class="plan-topbar" style="background:${co.colors.bg};border-bottom-color:${tb};">
+    <div class="plan-co-wrap">
+      ${role==='admin'?`<button class="mon-back" onclick="goAdmin()" style="background:${ts};color:${td};border:1px solid ${tb};">←</button>`:''}
+      <div class="plan-logo" style="background:${P}22;color:${P};">
+        ${co.logo?`<img src="${co.logo}" alt="">`:co.name.substring(0,2).toUpperCase()}
+      </div>
+      <div>
+        <div class="plan-co-name" style="color:${tv};">${co.name}</div>
+        <div class="plan-co-proj" style="color:${td};">${co.proj||'Plano de Ação 5W2H'}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:14px;border:1px solid ${tb};font-size:11px;color:${td};">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 5px var(--success);"></span>
+        ${co.resp}
+      </div>
+      ${role==='admin'?`<button class="btn btn-outline btn-sm" style="border-color:${tb};color:${td};" onclick="openAddCat('${co.id}')">＋ Categoria</button>`:''}
+    </div>
+  </div>
+
+  <div class="plan-body">
+    <div class="meta-row" style="--co-border:${tb};--co-surface:${ts};--co-text:${tv};--co-dim:${td};">
+      <div class="mchip"><span>Responsável</span><strong style="color:${tv};">${co.resp}</strong></div>
+      ${co.loc?`<div class="mchip"><span>Local</span><strong style="color:${tv};">${co.loc}</strong></div>`:''}
+      ${co.proj?`<div class="mchip"><span>Projeto</span><strong style="color:${tv};">${co.proj}</strong></div>`:''}
+    </div>
+
+    <div class="prog-box" style="background:${ts};border-color:${tb};">
+      <div class="prog-top">
+        <div class="prog-lbl" style="color:${td};">Progresso Geral</div>
+        <div class="prog-pct" style="color:${P};">${pct}%</div>
+      </div>
+      <div class="prog-bar" style="background:${tb};"><div class="prog-fill" style="width:${pct}%;background:${P};"></div></div>
+      <div class="prog-info" style="color:${td};">
+        <span>✓ ${done} concluídas</span>
+        <span>◑ ${partial} em andamento</span>
+        <span>○ ${total-done-partial} pendentes</span>
+      </div>
+    </div>`;
+
+  co.categories.forEach(cat=>{
+    html+=renderCatBlock(cat,co,role,P,tv,td,ts,tb);
+  });
+
+  if(role==='admin') html+=`
+    <div style="text-align:center;padding:16px 0 4px;">
+      <button class="btn btn-outline btn-sm" style="border-color:${tb};color:${td};" onclick="openAddCat('${co.id}')">＋ Nova Categoria</button>
+    </div>`;
+
+  html+=`</div>`;
+  screen.innerHTML=html;
+}
+
+function renderCatBlock(cat, co, role, P, tv, td, ts, tb){
+  const acts=cat.actions||[];
+  let rows='';
+  acts.forEach(ac=>{
+    const isDone=ac.status==='done';
+    const isPart=ac.status==='partial';
+    rows+=`<tr>
+      <td class="td-status">
+        <button class="status-btn ${ac.status}" onclick="cycleStatus('${co.id}','${cat.id}','${ac.id}')"
+          title="Clique para atualizar status"
+          style="${isDone?'background:var(--success);border-color:var(--success);color:#fff;':isPart?`border-color:${P};background:${P}22;color:${P};`:`border-color:${tb};`}">
+          ${isDone?'✓':isPart?'◑':''}
+        </button>
+      </td>
+      <td style="color:${tv};font-weight:500;">${ac.what}</td>
+      <td>${ac.why||'—'}</td>
+      <td>${ac.when||'—'}</td>
+      <td>${ac.where||'—'}</td>
+      <td>${ac.who||'—'}</td>
+      <td class="td-how">${ac.how||'—'}</td>
+      <td>${ac.howmuch||'—'}</td>
+      ${role==='admin'?`
+      <td class="td-acts">
+        <button class="row-btn" onclick="editActModal('${co.id}','${cat.id}','${ac.id}')" title="Editar">✏</button>
+        <button class="row-btn" onclick="delAct('${co.id}','${cat.id}','${ac.id}')" title="Excluir" style="color:var(--danger);">✕</button>
+      </td>`:''}
+    </tr>`;
+  });
+
+  // header bg gradient based on primary color
+  return `
+  <div class="cat-block" style="background:${ts};border-color:${tb};">
+    <div class="cat-head" onclick="toggleCat(this.parentElement)" style="background:${ts};">
+      <div class="cat-head-left">
+        <div class="cat-icon" style="background:${cat.color}22;">${cat.icon}</div>
+        <div>
+          <div class="cat-title" style="color:${tv};">${cat.name}</div>
+          <div class="cat-count" style="color:${td};">${acts.length} ação${acts.length!==1?'ões':''}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        ${role==='admin'?`
+        <button class="btn btn-outline btn-sm" style="border-color:${tb};color:${td};" onclick="event.stopPropagation();openAddAct('${co.id}','${cat.id}')">＋ Ação</button>
+        <button class="row-btn" style="background:${ts};border:1px solid ${tb};color:${td};width:28px;height:28px;" onclick="event.stopPropagation();openEditCat('${co.id}','${cat.id}')" title="Editar categoria">✏</button>
+        <button class="row-btn" style="background:rgba(224,85,85,.08);border:1px solid rgba(224,85,85,.22);color:var(--danger);width:28px;height:28px;" onclick="event.stopPropagation();delCat('${co.id}','${cat.id}')" title="Excluir categoria">🗑</button>
+        `:''}
+        <span class="cat-chevron" style="color:${td};">▼</span>
+      </div>
+    </div>
+    <div class="cat-body">
+      <div class="w2h-table-wrap">
+        <table class="w2h-table">
+          <thead>
+            <tr style="background:linear-gradient(135deg,${P},${lighten(P,20)});">
+              <th style="width:3%;text-align:center;"></th>
+              <th class="col-what"><span class="col-key">What?</span><span class="col-pt">O que?</span></th>
+              <th class="col-why"><span class="col-key">Why?</span><span class="col-pt">Por que?</span></th>
+              <th class="col-when"><span class="col-key">When?</span><span class="col-pt">Quando?</span></th>
+              <th class="col-where"><span class="col-key">Where?</span><span class="col-pt">Onde?</span></th>
+              <th class="col-who"><span class="col-key">Who?</span><span class="col-pt">Quem?</span></th>
+              <th class="col-how"><span class="col-key">How?</span><span class="col-pt">Como?</span></th>
+              <th class="col-howm"><span class="col-key">How much?</span><span class="col-pt">Quanto?</span></th>
+              ${role==='admin'?`<th class="col-act" style="text-align:center;font-size:10px;opacity:.7;">Ações</th>`:''}
+            </tr>
+          </thead>
+          <tbody style="background:${ts};">
+            ${rows||`<tr><td colspan="${role==='admin'?9:8}" class="w2h-empty" style="color:${td};">Nenhuma ação nesta categoria. ${role==='admin'?'<a href="#" onclick="openAddAct(\''+co.id+'\',\''+cat.id+'\')" style="color:'+P+';">Adicionar ação</a>':''}</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function lighten(hex,pct){
+  try{
+    let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    r=Math.min(255,r+Math.round(255*pct/100));
+    g=Math.min(255,g+Math.round(255*pct/100));
+    b=Math.min(255,b+Math.round(255*pct/100));
+    return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return hex; }
+}
+
+function toggleCat(block){ block.classList.toggle('collapsed'); }
+
+function cycleStatus(coId,catId,acId){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  const cat=co.categories.find(c=>c.id===catId); if(!cat) return;
+  const ac=cat.actions.find(a=>a.id===acId); if(!ac) return;
+  const cyc=['pending','partial','done'];
+  ac.status=cyc[(cyc.indexOf(ac.status)+1)%3];
+  saveS();
+  openPlan(coId,S.planRole);
+}
+
+// ════════ ACTION MODAL ════════
+function openAddAct(coId,catId){ S.editActCtx={coId,catId,acId:null}; document.getElementById('ma-title').textContent='Nova Ação'; ['what','why','when','where','who','howm','how'].forEach(f=>{ const el=document.getElementById('fa-'+f); if(el) el.value=''; }); openModal('modal-action'); }
+function editActModal(coId,catId,acId){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  const cat=co.categories.find(c=>c.id===catId); if(!cat) return;
+  const ac=cat.actions.find(a=>a.id===acId); if(!ac) return;
+  S.editActCtx={coId,catId,acId};
+  document.getElementById('ma-title').textContent='Editar Ação';
+  document.getElementById('fa-what').value=ac.what||'';
+  document.getElementById('fa-why').value=ac.why||'';
+  document.getElementById('fa-when').value=ac.when||'';
+  document.getElementById('fa-where').value=ac.where||'';
+  document.getElementById('fa-who').value=ac.who||'';
+  document.getElementById('fa-howm').value=ac.howmuch||'';
+  document.getElementById('fa-how').value=ac.how||'';
+  openModal('modal-action');
+}
+function saveAction(){
+  const ctx=S.editActCtx; if(!ctx) return;
+  const what=document.getElementById('fa-what').value.trim();
+  if(!what){ toast('Preencha o campo "O que?".','d'); return; }
+  const co=S.companies.find(c=>c.id===ctx.coId); if(!co) return;
+  const cat=co.categories.find(c=>c.id===ctx.catId); if(!cat) return;
+  const d={what,why:document.getElementById('fa-why').value.trim(),when:document.getElementById('fa-when').value.trim(),where:document.getElementById('fa-where').value.trim(),who:document.getElementById('fa-who').value.trim(),howmuch:document.getElementById('fa-howm').value.trim(),how:document.getElementById('fa-how').value.trim()};
+  if(ctx.acId){ const ac=cat.actions.find(a=>a.id===ctx.acId); if(ac) Object.assign(ac,d); toast('Ação atualizada.','s'); }
+  else{ cat.actions.push({...d,id:'ac_'+Date.now(),status:'pending'}); toast('Ação adicionada.','s'); }
+  saveS(); closeModal('modal-action'); openPlan(ctx.coId,S.planRole);
+}
+function delAct(coId,catId,acId){
+  if(!confirm('Excluir esta ação?')) return;
+  const co=S.companies.find(c=>c.id===coId);
+  const cat=co?.categories.find(c=>c.id===catId); if(!cat) return;
+  cat.actions=cat.actions.filter(a=>a.id!==acId);
+  saveS(); openPlan(coId,S.planRole); toast('Ação excluída.','d');
+}
+
+// ════════ CATEGORY MODAL ════════
+function openAddCat(coId){
+  S.editCatCtx={coId, catId:null};
+  document.getElementById('mcat-title').textContent='Nova Categoria';
+  document.getElementById('fcat-name').value='';
+  document.getElementById('fcat-icon').value='';
+  document.getElementById('fcat-color').value='#c9922a';
+  openModal('modal-cat');
+}
+function openEditCat(coId, catId){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  const cat=co.categories.find(c=>c.id===catId); if(!cat) return;
+  S.editCatCtx={coId, catId};
+  document.getElementById('mcat-title').textContent='Editar Categoria';
+  document.getElementById('fcat-name').value=cat.name;
+  document.getElementById('fcat-icon').value=cat.icon;
+  document.getElementById('fcat-color').value=cat.color;
+  openModal('modal-cat');
+}
+function delCat(coId, catId){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  const cat=co.categories.find(c=>c.id===catId); if(!cat) return;
+  if(!confirm(`Excluir a categoria "${cat.name}" e todas as suas ações?`)) return;
+  co.categories=co.categories.filter(c=>c.id!==catId);
+  saveS(); openPlan(coId,S.planRole); toast('Categoria excluída.','d');
+}
+function saveCat(){
+  const ctx=S.editCatCtx; if(!ctx) return;
+  const name=document.getElementById('fcat-name').value.trim();
+  if(!name){ toast('Preencha o nome da categoria.','d'); return; }
+  const icon=document.getElementById('fcat-icon').value||'📌';
+  const color=document.getElementById('fcat-color').value;
+  const co=S.companies.find(c=>c.id===ctx.coId); if(!co) return;
+  if(ctx.catId){
+    const cat=co.categories.find(c=>c.id===ctx.catId);
+    if(cat){ cat.name=name; cat.icon=icon; cat.color=color; }
+    toast('Categoria atualizada.','s');
+  } else {
+    co.categories.push({id:'cat_'+Date.now(), name, icon, color, actions:[]});
+    toast('Categoria adicionada.','s');
+  }
+  saveS(); closeModal('modal-cat'); openPlan(ctx.coId,S.planRole);
+}
+
+// ════════ MONITOR ════════
+function openMonitor(coId){
+  const co=S.companies.find(c=>c.id===coId); if(!co) return;
+  renderMonitor(co);
+  showScreen('monitor');
+}
+function renderMonitor(co){
+  const screen=document.getElementById('screen-monitor');
+  const {total,done,partial}=coStats(co);
+  const pending=total-done-partial;
+  const pct=total?Math.round((done+partial*.5)/total*100):0;
+  const P=co.colors.p;
+  const link=`${location.origin}${location.pathname}?co=${co.id}`;
+
+  let catRows='';
+  co.categories.forEach(cat=>{
+    const acts=cat.actions||[];
+    const cd=acts.filter(a=>a.status==='done').length;
+    const cp=acts.length?Math.round(cd/acts.length*100):0;
+    catRows+=`<tr>
+      <td style="color:var(--text);">${cat.icon} ${cat.name}</td>
+      <td>${acts.length}</td>
+      <td style="color:var(--success);">${cd}</td>
+      <td><div style="display:flex;align-items:center;gap:7px;">
+        <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${cp}%;background:${P};border-radius:2px;"></div>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">${cp}%</span>
+      </div></td>
+    </tr>`;
+  });
+
+  let actRows='';
+  co.categories.forEach(cat=>{
+    (cat.actions||[]).forEach(ac=>{
+      actRows+=`<tr>
+        <td style="font-size:11px;opacity:.55;">${cat.icon}</td>
+        <td style="color:var(--text);">${ac.what}</td>
+        <td>${ac.who||'—'}</td>
+        <td>${ac.when||'—'}</td>
+        <td>${spill(ac.status)}</td>
+      </tr>`;
+    });
+  });
+
+  screen.innerHTML=`
+  <div class="monitor-head">
+    <button class="mon-back" onclick="goAdmin()">←</button>
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:${P};">${co.name}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Monitoramento 5W2H · Resp: ${co.resp}</div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="openPlan('${co.id}','admin')">📋 Ver Plano</button>
+  </div>
+  <div class="page-body">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-lbl">Total</div><div class="kpi-val" style="color:${P};">${total}</div><div class="kpi-sub">${co.categories.length} categorias</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Concluídas</div><div class="kpi-val" style="color:var(--success);">${done}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Em Andamento</div><div class="kpi-val" style="color:${P};">${partial}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Pendentes</div><div class="kpi-val" style="color:var(--danger);">${pending}</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">Progresso</div><div class="kpi-val" style="color:${P};">${pct}%</div>
+        <div style="height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${P};border-radius:2px;"></div></div>
+      </div>
+    </div>
+    <div class="link-box">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:6px;">Link do Plano (Responsável)</div>
+        <input class="link-inp" id="share-link" value="${link}" readonly>
+      </div>
+      <div style="display:flex;gap:7px;flex-shrink:0;">
+        <button class="btn btn-outline btn-sm" onclick="copyLink()">📋 Copiar</button>
+        <button class="btn btn-gold btn-sm" onclick="openPlan('${co.id}','responsavel')">👁 Visualizar</button>
+      </div>
+    </div>
+    <div class="mtable-wrap">
+      <div class="mtable-lbl">Por Categoria</div>
+      <table class="mtable"><thead><tr><th>Categoria</th><th>Ações</th><th>Concluídas</th><th>Progresso</th></tr></thead>
+      <tbody>${catRows}</tbody></table>
+    </div>
+    <div class="mtable-wrap">
+      <div class="mtable-lbl">Todas as Ações</div>
+      <table class="mtable"><thead><tr><th></th><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead>
+      <tbody>${actRows}</tbody></table>
+    </div>
+  </div>`;
+}
+function copyLink(){ const i=document.getElementById('share-link'); if(!i) return; navigator.clipboard.writeText(i.value).then(()=>toast('Link copiado!','s')).catch(()=>{i.select();document.execCommand('copy');toast('Link copiado!','s');}); }
+
+// ════════ HELPERS ════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
+
+function pickColor(el,type){
+  const row=el.closest('.crow');
+  row.querySelectorAll('.cswatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+  S.tmpColors[type]=el.dataset.c;
+  if(type==='p') document.getElementById('cp-p').value=el.dataset.c;
+  if(type==='bg') document.getElementById('cp-bg').value=el.dataset.c;
+  updatePrev();
+}
+function customColor(type,val){ S.tmpColors[type]=val; const row=document.getElementById('cp-'+type).closest('.crow'); row.querySelectorAll('.cswatch').forEach(s=>s.classList.remove('sel')); updatePrev(); }
+function updatePrev(){
+  const p=S.tmpColors.p;
+  const el=document.getElementById('cp-prev');
+  if(el){ el.style.background=p+'22'; el.style.color=p; el.style.borderColor=p+'44'; }
+}
+function resetSwatches(){
+  document.querySelectorAll('#modal-co .crow').forEach(row=>{ row.querySelectorAll('.cswatch').forEach((s,i)=>s.classList.toggle('sel',i===0)); });
+  document.getElementById('cp-p').value='#6aaa1e';
+  document.getElementById('cp-bg').value='#0a0a0a';
+  updatePrev();
+}
+function handleLogo(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ S.tmpLogo=ev.target.result; document.getElementById('logo-ph').style.display='none'; document.getElementById('logo-pv').style.display='flex'; document.getElementById('logo-pv-img').src=ev.target.result; document.getElementById('logo-pv-name').textContent=f.name; };
+  r.readAsDataURL(f);
+}
+function isDark(hex){ try{ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return(r*.299+g*.587+b*.114)<128; }catch(e){ return true; } }
+function toast(msg,type=''){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg;
+  c.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+// ════════ INIT ════════
+loadS();
+const urlP=new URLSearchParams(location.search);
+const coP=urlP.get('co');
+if(coP){ const co=S.companies.find(c=>c.id===coP); if(co) openPlan(co.id,'responsavel'); }
+</script>
+</body>
+</html>
